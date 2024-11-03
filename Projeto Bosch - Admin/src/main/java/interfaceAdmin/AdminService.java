@@ -56,7 +56,7 @@ public class AdminService {
                     }
                 } else if (resposta.matches("\\d+")) {
                     try {
-                    idDigitado = scanner.nextInt();
+                    idDigitado = Integer.parseInt(resposta);
                     if (verificarId(idDigitado, agendamento, cliente, carro)) {
                         listarCarro(carro, cliente);
                         listarCliente(cliente);
