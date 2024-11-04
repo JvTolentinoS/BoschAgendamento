@@ -24,27 +24,18 @@ public class ClienteServico {
         private Carro carroSession;
         private Agendamento agendamentoSession;
 
-
-        // SERVIÇO BÁSICO DO CLIENTE
-        public void clientInitializer() {
-            clientSession = new Cliente();
-            carroSession = new Carro();
-            agendamentoSession = new Agendamento();
-            registrador(clientSession,
-                    carroSession,
-                    agendamentoSession);
-        }
+        /* SERVIÇO BÁSICO DO CLIENTE */
 
         // REGISTRO DE CLIENTE
-        private void registrador(Cliente cliente, Carro carro, Agendamento agendamento) {
+        public void registrador(Cliente cliente, Carro carro, Agendamento agendamento) {
             String cpf, nome;
-            int i = -1; // SELECIONADOR
+            int i = -1;
             Scanner scanner = new Scanner(System.in);
                 System.out.println("\n========================== CADASTRANDO CLIENTE ===========================");
                 System.out.println("Para ter acesso, por favor digite seu NOME e CPF: ");
                     do {
                         System.out.print("Digite seu CPF: ");
-                        cpf = scanner.next();
+                        cpf = scanner.nextLine();
                         cpf = cpf.replaceAll("[.-]", "");
                         if (ValidadorCollection.validarCPF(cpf)) {
                             cliente.setCpf_cliente(cpf);
@@ -57,29 +48,29 @@ public class ClienteServico {
                     if (!ValidadorCollection.verificarSeClienteExiste(cliente, clienteDAO)) {
                         do {
                             System.out.print("Digite seu Nome: ");
-                            nome = scanner.next();
+                            nome = scanner.nextLine();
                             if (ValidadorCollection.validarNome(nome)) {
                                 cliente.setNome_cliente(nome);
                                 break;
                             } else {
-                                UtilCollection.defaultError(scanner); // FALHA
+                                UtilCollection.defaultError(scanner);
                             }
                         } while (true);
                     } else {
-                        clienteNome(cliente); // PEGA O NOME COM BASE NO CPF E BANCO DE DADOS
+                        clienteNome(cliente);
                     }
 
                     do {
                         try {
-                            UtilCollection.defaultConfirm(); // CONFIRMAR
+                            UtilCollection.defaultConfirm();
                             i = scanner.nextInt();
                             switch (i) {
                                 case 0:
-                                    UtilCollection.cancel(); // CANCELANDO...
-                                    limparCliente(cliente, (interfaceService.initialInterface(clienteServico)));
+                                    UtilCollection.cancel();
+                                    limparCliente(cliente, InterfaceService.initialInterface(clienteServico, cliente, carro, agendamento));
                                     break;
                                 case 1:
-                                    UtilCollection.confirm();   // CONFIRMANDO...
+                                    UtilCollection.confirm();
                                     if (ValidadorCollection.verificarSeClienteExiste(cliente, clienteDAO)) {
                                         if (ValidadorCollection.verificarCarro(cliente, carroDAO)) {
                                             instrucaoCarroExiste(carro,
@@ -103,6 +94,7 @@ public class ClienteServico {
                                 }
                         } catch (InputMismatchException e) {
                             UtilCollection.defaultError(scanner); // FALHA
+                            scanner.next();
                         }
                     } while (i != 0);
         }
@@ -206,7 +198,6 @@ public class ClienteServico {
                                 UtilCollection.defaultError(scanner);
                             }
                         }
-
                     } while (true);
 
                     do {
@@ -252,14 +243,15 @@ public class ClienteServico {
                                 switch (i) {
                                     case 0:
                                         UtilCollection.cancel();
-                                        limparCarro(carro,(interfaceService.initialInterface(clienteServico)));
+                                        limparCarro(carro,(InterfaceService.initialInterface(clienteServico, cliente, carro, agendamento)));
                                     case 1:
                                         UtilCollection.confirm();
                                         if (ValidadorCollection.verificarCarroExiste(cliente, carroDAO)) {
                                             System.out.println("Este carro já foi cadastrado, tente novamente.");
                                             scanner.nextLine();
                                         } else {
-                                            carroDAO.salvar(carro, cliente);
+                                            carro.setCpf(cliente.getCpf_cliente());
+                                            carroDAO.salvar(carro);
                                             clienteServico.instrucaoAgendamento(carro,
                                                     agendamento,
                                                     cliente);
@@ -271,6 +263,7 @@ public class ClienteServico {
 
                         } catch (InputMismatchException e) {
                             UtilCollection.defaultError(scanner);
+                            scanner.next();
                         }
                     } while (i != 0);
                 } catch (InputMismatchException e) {
@@ -356,8 +349,7 @@ public class ClienteServico {
                         }
                     } catch (InputMismatchException e) {
                         System.out.println("Opção inválida! Por favor, escolha um horário disponível (1-11)");
-                        System.out.print("\nEscolha uma opção (1-11): ");
-                        scanner.nextLine();
+                        scanner.next();
                     }
                 }
 
@@ -389,33 +381,36 @@ public class ClienteServico {
                 System.out.println("Serviço/Defeito: " + defeito);
 
                 // CONFIRMAÇÃO DO AGENDAMENTO
-                boolean confirmarAgendamento = false;
-                while (!confirmarAgendamento) {
-                    System.out.print("Deseja confirmar o agendamento? Digite 1 para confirmar ou 0 para não prosseguir: ");
-                    int opcaoConfirmacao = scanner.nextInt();
-                    scanner.nextLine();
+                    boolean confirmarAgendamento = false;
+                    while (!confirmarAgendamento) {
+                        System.out.print("Deseja confirmar o agendamento? Digite 1 para confirmar ou 0 para não prosseguir: ");
+                        try {
+                            int opcaoConfirmacao = scanner.nextInt();
+                            scanner.nextLine();
 
-                    if (opcaoConfirmacao == 1) {
-                        System.out.println("Agendamento confirmado!");
-                        agendamento.setCarroDescricao(defeito);
-                        agendamento.setDataCriacao(new Date());
-                        agendamento.setCpf(cliente.getCpf_cliente());
-                        agendamento.setPlaca(carro.getPlaca());
-                        agendamentoDAO.salvar(agendamento,
-                                cliente,
-                                carro,
-                                diaEscolhido,
-                                horaEscolhida);
-                        confirmarAgendamento = true; // Finaliza a confirmação
-                    } else if (opcaoConfirmacao == 0) {
-                        System.out.println("Agendamento não prosseguido. Reiniciando o processo...");
-                        confirmarAgendamento = true; // Finaliza a confirmação
-                        // O loop principal vai reiniciar
-                        agendamento.setCarroDescricao(null);
-                        agendamento.setDataAgendada(null);
-                    } else {
-                        System.out.println("Opção inválida! Por favor, digite 1 para confirmar ou 0 para não prosseguir.");
-                    }
+                        if (opcaoConfirmacao == 1) {
+                            System.out.println("Agendamento confirmado!");
+                            agendamento.setCarroDescricao(defeito);
+                            agendamento.setDataCriacao(new Date());
+                            agendamento.setCpf(cliente.getCpf_cliente());
+                            agendamento.setPlaca(carro.getPlaca());
+                            agendamento.setDia(diaEscolhido);
+                            agendamento.setHora(horaEscolhida);
+                            agendamentoDAO.salvar(agendamento);
+                            confirmarAgendamento = true; // Finaliza a confirmação
+                        } else if (opcaoConfirmacao == 0) {
+                            System.out.println("Agendamento não prosseguido. Reiniciando o processo...");
+                            confirmarAgendamento = true; // Finaliza a confirmação
+                            // O loop principal vai reiniciar
+                            agendamento.setCarroDescricao(null);
+                            agendamento.setDataAgendada(null);
+                        } else {
+                            System.out.println("Opção inválida! Por favor, digite 1 para confirmar ou 0 para não prosseguir.");
+                        }
+                    } catch (InputMismatchException e) {
+                UtilCollection.defaultError(scanner);
+                scanner.next();
+            }
                 }
 
                 // DEPOIS DE DEFINIR A AGENDA
@@ -427,13 +422,14 @@ public class ClienteServico {
                 opcao = scanner.nextInt();
                 switch (opcao)
                 {
-                    case 1: interfaceService.initialInterface(clienteServico);
+                    case 1: InterfaceService.initialInterface(clienteServico, cliente, carro, agendamento);
                     break;
                     case 0: System.exit(0);
                     default: UtilCollection.defaultSwitch(scanner);
                 }
                     } catch (InputMismatchException e) {
                         UtilCollection.defaultError(scanner);
+                        scanner.next();
                 }
             } while (true);
         }
@@ -442,4 +438,169 @@ public class ClienteServico {
         private static String removeHifen(String placa) {
             return placa.replace("-", "");
         }
+
+        /* CONSULTA INDIVIDUAL DO CLIENTE */
+
+        public void registradorVerAgendas(Cliente cliente, Carro carro, Agendamento agendamento) {
+        String cpf, nome;
+        int i = -1;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\n========================== PROCURANDO AGENDAS REGISTRADAS ===========================");
+        System.out.println("Para ter acesso, precisamos de seu CPF: ");
+        do {
+            System.out.print("Digite seu CPF: ");
+            cpf = scanner.next();
+            cpf = cpf.replaceAll("[.-]", "");
+            if (ValidadorCollection.validarCPF(cpf) && ValidadorCollection.verificarSeClienteExiste(cpf, clienteDAO) && ValidadorCollection.verificarSeClienteAgenda(cpf, agendamentoDAO)) {
+                cliente.setCpf_cliente(cpf);
+                break;
+            } else {
+                System.out.println("Falha, nenhuma agenda encontrada");
+                limparCliente(cliente, InterfaceService.initialInterface(clienteServico, cliente, carro, agendamento));
+            }
+        } while (true);
+
+        consultarAgenda(cliente, agendamento, carro);
+
+    }
+
+        public static void consultarAgenda(Cliente cliente, Agendamento agendamento, Carro carro) {
+        int idDigitado = 0;
+        boolean continuar = true;
+        Scanner scanner = new Scanner(System.in);
+
+        do {
+            try {
+                listagemDeAgendas(cliente, agendamento, agendamentoDAO);
+
+                System.out.println("\nEscolha um \"ID\" para consultar os detalhes ");
+                System.out.println("\nDigite D para Deletar um agendamento");
+                System.out.println("\nDigite 0 para Voltar");
+                System.out.print("\nResposta: ");
+                String resposta = scanner.next().trim().toUpperCase();
+
+                if (resposta.equals("0")) {
+                    limparCliente(cliente, InterfaceService.initialInterface(clienteServico, cliente, carro, agendamento));
+                    continuar = false;
+                } else if (resposta.equals("D")) {
+                    System.out.print("Digite o ID do agendamento que deseja deletar: ");
+                    idDigitado = scanner.nextInt();
+                    if (apagarAgenda(idDigitado, cliente)) {
+                        System.out.println("Agendamento deletado com sucesso.");
+                    } else {
+                        System.out.println("Falha ao deletar o agendamento. Verifique o ID.");
+                    }
+                } else if (resposta.matches("\\d+")) {
+                    try {
+                        idDigitado = Integer.parseInt(resposta);
+                        if (verificarId(idDigitado, agendamento, cliente, carro)) {
+                            listarCarro(carro, cliente);
+                            listarCliente(cliente);
+                            listagemEscolhida(cliente, carro, agendamento);
+
+                            boolean respostaValida = false;
+                            while (!respostaValida) {
+                                System.out.print("\nDeseja consultar outro agendamento? (S/N): ");
+                                String resp = scanner.next().trim().toUpperCase();
+
+                                if (resp.equals("S")) {
+                                    respostaValida = true;
+                                } else if (resp.equals("N")) {
+                                    continuar = false; // Sai do loop se o usuário não quiser mais consultar
+                                    respostaValida = true;
+                                } else {
+                                    System.out.println("Entrada inválida! Por favor, digite apenas 'S' para Sim ou 'N' para Não.");
+                                }
+                            }
+                        } else {
+                            System.out.println("ID não encontrado. Por favor, escolha um ID válido.");
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Entrada Inválida");
+                        scanner.next();
+                    }
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInsira um valor válido!");
+                scanner.next();
+            }
+        } while (continuar);
+    }
+
+        public static void listagemDeAgendas(Cliente cliente, Agendamento agendamento, AgendamentoDAO agendamentoDAO) {
+            System.out.println("\n========================== LISTA DE AGENDAMENTOS ===========================");
+            System.out.format("+----+-------------+-----------+-----------------------+------------------+%n");
+            System.out.format("| ID |     CPF     |   PLACA   |     DATA E HORÁRIO    |  DATA DE CRIACAO |%n");
+            System.out.format("+----+-------------+-----------+-----------------------+------------------+%n");
+
+            String rowFormat = "| %-2d | %-11s | %-9s | %-20s | %-16s |%n";
+            for (Agendamento listagem : agendamentoDAO.getAgendaUsuario(cliente.getCpf_cliente())) {
+                System.out.format(rowFormat,
+                        listagem.getIdAgenda(),
+                        listagem.getCpf(),
+                        listagem.getPlaca(),
+                        listagem.getDataAgendada(),
+                        listagem.getDataCriacao());
+                System.out.format("+----+-------------+-----------+-----------------------+------------------+%n");
+            }
+        }
+
+        public static boolean verificarId(int id, Agendamento agendamento, Cliente cliente, Carro carro) {
+        for (Agendamento a : agendamentoDAO.getAgendaUsuario(cliente.getCpf_cliente())) {
+            if (a.getIdAgenda() == id) {
+                agendamento.setIdAgenda(a.getIdAgenda());
+                agendamento.setDataAgendada(a.getDataAgendada());
+                agendamento.setCarroDescricao(a.getCarroDescricao());
+                cliente.setCpf_cliente(a.getCpf());
+                carro.setPlaca(a.getPlaca());
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+        public static boolean apagarAgenda(int id, Cliente cliente) {
+        for (Agendamento a : agendamentoDAO.getAgendaUsuario(cliente.getCpf_cliente())) {
+            if (a.getIdAgenda() == id) {
+                agendamentoDAO.deletarAgendamentoPorId(a.getIdAgenda());
+                return true;
+            }
+        }
+        return false;
+    }
+
+        public static void listarCarro(Carro carro, Cliente cliente) {
+        for (Carro c : carroDAO.getCarrosCliente(cliente.getCpf_cliente())) {
+            if (Objects.equals(carro.getPlaca(), c.getPlaca())) {
+                carro.setPlaca(c.getPlaca());
+                carro.setMarca(c.getMarca());
+                carro.setModelo(c.getModelo());
+                carro.setAno(c.getAno());
+            }
+        }
+    }
+
+        public static void listarCliente(Cliente cliente) {
+        for (Cliente c : clienteDAO.getClientes()) {
+            if (Objects.equals(cliente.getCpf_cliente(), c.getCpf_cliente())) {
+                cliente.setNome_cliente(c.getNome_cliente());
+            }
+        }
+    }
+
+        public static void listagemEscolhida(Cliente cliente, Carro carro, Agendamento agendamento) {
+        // Exibindo detalhes do agendamento em formato de tópicos
+        System.out.println("\n======================== DETALHES DO AGENDAMENTO ========================");
+        System.out.println("ID do Agendamento: " + agendamento.getIdAgenda());
+        System.out.println("Data e Horário Escolhido: " + agendamento.getDataAgendada());
+        System.out.println("Placa do Carro: " + carro.getPlaca());
+        System.out.println("Marca do Carro: " + carro.getMarca());
+        System.out.println("Modelo do Carro: " + carro.getModelo());
+        System.out.println("Ano do Carro: " + carro.getAno());
+        System.out.println("Defeito: " + agendamento.getCarroDescricao());
+        System.out.println("Nome do Cliente: " + cliente.getNome_cliente());
+        System.out.println("CPF do Cliente: " + cliente.getCpf_cliente());
+        System.out.println("===========================================================================");
+    }
 }

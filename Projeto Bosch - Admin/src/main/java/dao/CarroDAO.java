@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CarroDAO {
+
     public void salvar(Carro carro, Cliente cliente) {
         String sql = "INSERT INTO carro (carro_placa, carro_modelo, carro_marca, carro_ano, cpf) VALUE (?, ?, ?, ?, ?)";
 
@@ -79,7 +80,7 @@ public class CarroDAO {
     }
 
     public void deletar(Carro carro, Cliente cliente, String cpf) {
-        String sql = "DELETE FROM carro WHERE cpf = ?";
+        String sql = "DELETE FROM carro WHERE carro_placa = ?";
 
         Connection conn = null;
         PreparedStatement pstm = null;

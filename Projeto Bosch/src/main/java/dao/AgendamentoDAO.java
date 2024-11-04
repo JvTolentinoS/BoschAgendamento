@@ -1,8 +1,6 @@
 package dao;
 
 import conexaofabrica.Conexao;
-import entidade.Carro;
-import entidade.Cliente;
 import entidade.Agendamento;
 
 import java.sql.*;
@@ -13,8 +11,8 @@ import java.util.List;
 
 public class AgendamentoDAO {
 
-    //CRIA UM AGENDAMENTO (CPF)
-    public void salvar(Agendamento agendamento, Cliente cliente, Carro carro, int dia, int hora) {
+
+    public void salvar(Agendamento agendamento) {
         String sql = "INSERT INTO agenda (cpf, data_criacao, data_agendada, carro_placa, carro_descricao) VALUES (?, ?, ?, ?, ?)";
 
         Connection conn = null;
@@ -24,13 +22,13 @@ public class AgendamentoDAO {
             conn = Conexao.criarConexao();
             pstm = (PreparedStatement) conn.prepareStatement(sql);
 
-            pstm.setString(1, cliente.getCpf_cliente());
+            pstm.setString(1, agendamento.getCpf());
             //DATA QUE VAI SER DEFINDA PARA CONSULTA
-            LocalDateTime dataPrevista = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), dia, hora,0);
+            LocalDateTime dataPrevista = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), agendamento.getDia(), agendamento.getHora(),0);
             pstm.setDate(2, new Date(agendamento.getDataCriacao().getTime()));
             pstm.setTimestamp(3, Timestamp.valueOf(dataPrevista));
             //
-            pstm.setString(4, carro.getPlaca());
+            pstm.setString(4, agendamento.getPlaca());
             pstm.setString(5, agendamento.getCarroDescricao());
 
             pstm.execute();
@@ -48,8 +46,7 @@ public class AgendamentoDAO {
         }
     }
 
-    // ATUALIZA A DATA AGENDADA E OPCIONALMENTE A PLACA DO CARRO
-    public void atualizar(Agendamento agendamento, int mes, int dia, int hora) {
+    public void atualizar(Agendamento agendamento) {
 
         String sql = "UPDATE agenda SET data_agendada = ? WHERE cpf = ? AND carro_placa = ?";
 
@@ -62,7 +59,7 @@ public class AgendamentoDAO {
 
             //DATA QUE VAI SER DEFINDA PARA CONSULTA
 
-            LocalDateTime dataPrevista = LocalDateTime.of(LocalDate.now().getYear(), mes, dia, hora,0);
+            LocalDateTime dataPrevista = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), agendamento.getDia(), agendamento.getHora(),0);
             pstm.setTimestamp(1, Timestamp.valueOf(dataPrevista));
             pstm.setString(2, agendamento.getCpf());
             pstm.setString(3, agendamento.getPlaca());
@@ -80,9 +77,8 @@ public class AgendamentoDAO {
 
     }
 
-    // DELETA O AGENDAMENTO COM BASE NO ID DA AGENDA
-    public void deletarCPF (String cpf) {
-        String sql = "DELETE FROM agenda WHERE cpf = ?";
+    public void deletarAgendamentoPorId(int id) {
+        String sql = "DELETE FROM agenda WHERE idAgenda = ?";
 
         Connection conn = null;
         PreparedStatement pstm = null;
@@ -91,48 +87,20 @@ public class AgendamentoDAO {
             conn = Conexao.criarConexao();
             pstm = (PreparedStatement) conn.prepareStatement(sql);
 
-            pstm.setString(1, cpf);
+            pstm.setInt(1, id);
             pstm.execute();
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if (conn!=null) {conn.close();}
-                if (pstm!=null) {pstm.close();}
+                if (conn != null) { conn.close(); }
+                if (pstm != null) { pstm.close(); }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    // DELETA O AGENDAMENTO COM BASE NA PLACA
-    public void deletarPlaca (String placa) {
-        String sql = "DELETE FROM agenda WHERE carro_placa = ?";
-
-        Connection conn = null;
-        PreparedStatement pstm = null;
-
-        try {
-            conn = Conexao.criarConexao();
-            pstm = (PreparedStatement) conn.prepareStatement(sql);
-
-            pstm.setString(1, placa);
-            pstm.execute();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn!=null) {conn.close();}
-                if (pstm!=null) {pstm.close();}
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    //APENAS PARA O ADMINISTRADOR
     public List<Agendamento> getAgendaTodos()   {
         String sql = "SELECT * FROM agenda";
 
@@ -152,9 +120,12 @@ public class AgendamentoDAO {
             while (rset.next()) {
                 Agendamento agendamento = new Agendamento();
 
+                agendamento.setIdAgenda(rset.getInt("idAgenda"));
                 agendamento.setCpf(rset.getString("cpf"));
                 agendamento.setDataCriacao(rset.getDate("data_criacao"));
                 agendamento.setDataAgendada(rset.getTimestamp("data_agendada"));
+                agendamento.setPlaca(rset.getString("carro_placa"));
+                agendamento.setCarroDescricao(rset.getString("carro_descricao"));
 
                 agendamentos.add(agendamento);
             }
@@ -175,7 +146,6 @@ public class AgendamentoDAO {
         }
     }
 
-    //APENAS USUÁRIOS
     public List<Agendamento> getAgendaUsuario(String cpf) {
         String sql = "SELECT * FROM agenda WHERE cpf = ?";
 
@@ -197,9 +167,12 @@ public class AgendamentoDAO {
             while (rset.next()) {
                 Agendamento agendamento = new Agendamento();
 
+                agendamento.setIdAgenda(rset.getInt("idAgenda"));
                 agendamento.setCpf(rset.getString("cpf"));
                 agendamento.setDataCriacao(rset.getDate("data_criacao"));
                 agendamento.setDataAgendada(rset.getTimestamp("data_agendada"));
+                agendamento.setPlaca(rset.getString("carro_placa"));
+                agendamento.setCarroDescricao(rset.getString("carro_descricao"));
 
                 agendamentos.add(agendamento);
             }

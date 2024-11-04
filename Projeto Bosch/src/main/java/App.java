@@ -6,8 +6,7 @@ import java.sql.Connection;
 import static conexaofabrica.Conexao.criarConexao;
 
 public class App {
-    static ClienteServico clienteServico = new ClienteServico();
-    static InterfaceService instancia = new InterfaceService();
+    ClienteServico clienteServico = new ClienteServico();
     public static void main(String[] args) throws Exception {
         try {
         Connection con = criarConexao();
@@ -15,8 +14,9 @@ public class App {
             System.out.println("Conexão obtida com sucesso");
             System.out.println(con);
             con.close();
+                ClienteServico clienteServico = new ClienteServico();
                 InterfaceService service = new InterfaceService();
-                service.initialInterface(clienteServico);
+                service.inicializadorCliente(clienteServico);
         }
 
         } catch (Exception e) {

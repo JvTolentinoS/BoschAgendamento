@@ -1,17 +1,28 @@
 package interfaceCliente;
 
+import entidade.Agendamento;
+import entidade.Carro;
+import entidade.Cliente;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class InterfaceService {
 
+    private Cliente clientSession;
+    private Carro carroSession;
+    private Agendamento agendamentoSession;
+
     static ClienteServico clienteServico = new ClienteServico();
-    public static void main(String[] args) {
-        InterfaceService logo = new InterfaceService();
-        logo.initialInterface(clienteServico);
+
+    public void inicializadorCliente(ClienteServico clienteServico) {
+        clientSession = new Cliente();
+        carroSession = new Carro();
+        agendamentoSession = new Agendamento();
+        initialInterface(clienteServico, clientSession, carroSession, agendamentoSession);
     }
 
-    public InterfaceService initialInterface(ClienteServico clienteServico) {
+    public static InterfaceService initialInterface(ClienteServico clienteServico, Cliente cliente, Carro carro, Agendamento agendamento) {
         logoText();
         introMessage();
         int i = -1;
@@ -23,10 +34,11 @@ public class InterfaceService {
                 switch (i) {
                     case 1: // Iniciar um Agendamento
                         System.out.println("Iniciando processo de criar agendamento...");
-                        clienteServico.clientInitializer();
+                        clienteServico.registrador(cliente, carro, agendamento);
                         break;
                         case 2: // Ver Agendamentos
                             System.out.println("Iniciando processo de ver agendamentos...");
+                            clienteServico.registradorVerAgendas(cliente, carro, agendamento);
                             break;
                             case 3: // Ver Carros
                                 System.out.println("Iniciando processo de ver carros...");
@@ -46,7 +58,8 @@ public class InterfaceService {
 
     private static void initialMenu() {
         System.out.println("\n========================== MENU INICIAL ===========================");
-        System.out.println("1 - Iniciar um Agendamento");
+        System.out.println("1 - Iniciar um agendamento");
+        System.out.println("2 - Consultar agendamentos existentes");
         System.out.println("0 - Sair");
         System.out.print("Resposta: ");
     }

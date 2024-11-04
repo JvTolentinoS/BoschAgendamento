@@ -1,13 +1,17 @@
 package interfaceCliente;
 
+import dao.AgendamentoDAO;
 import dao.CarroDAO;
 import dao.ClienteDAO;
 
+import entidade.Agendamento;
 import entidade.Carro;
 import entidade.Cliente;
 
 import java.time.LocalDate;
+import java.util.InputMismatchException;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class ValidadorCollection {
 
@@ -56,13 +60,31 @@ public class ValidadorCollection {
 
     // METODO VERIFICADOR - NOME
     public static boolean validarNome(String nome) {
-        return !nome.isEmpty() && nome.matches("^[\\p{L}\\s]*$") && nome.length() < 100;
+        return nome != null && !nome.isEmpty() && nome.matches("^[\\p{L}\\s]*$") && nome.length() < 100;
     }
 
     // METODO VERIFICADOR - CLIENTE
     public static boolean verificarSeClienteExiste(Cliente cliente, ClienteDAO clienteDAO) {
         for (Cliente clienteLista : clienteDAO.getClientes()) {
             if (Objects.equals(clienteLista.getCpf_cliente(), cliente.getCpf_cliente())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean verificarSeClienteExiste(String cpf, ClienteDAO clienteDAO) {
+        for (Cliente clienteLista : clienteDAO.getClientes()) {
+            if (Objects.equals(clienteLista.getCpf_cliente(), cpf)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean verificarSeClienteAgenda(String cpf, AgendamentoDAO agendamentoDAO) {
+        for (Agendamento a : agendamentoDAO.getAgendaUsuario(cpf)) {
+            if (a.getCpf()!=null && Objects.equals(a.getCpf(), cpf)) {
                 return true;
             }
         }
@@ -122,8 +144,6 @@ public class ValidadorCollection {
         }
     }
 
-
-
     // METODO VERIFICADOR - MODELO
     public static boolean verificarModelo(String modelo) {
         return !modelo.isEmpty() && modelo.matches("^[A-Za-z0-9]{2,}$") && modelo.length() < 100;
@@ -166,4 +186,6 @@ public class ValidadorCollection {
         // CASO O ANO NÃO SEJA CORRESPONDENTE
         return false;
     }
+
+
 }

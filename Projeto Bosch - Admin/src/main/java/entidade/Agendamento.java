@@ -1,9 +1,6 @@
 package entidade;
 
-import java.util.AbstractList;
 import java.util.Date;
-import java.util.Scanner;
-import java.util.ArrayList;
 
 public class Agendamento {
 
@@ -49,6 +46,20 @@ public class Agendamento {
         this.carroDescricao = carroDescricao;
     }
 
+    public int getHora() {
+        return hora;
+    }
+    public void setHora(int hora) {
+        this.hora = hora;
+    }
+
+    public int getDia() {
+        return dia;
+    }
+    public void setDia(int dia) {
+        this.dia = dia;
+    }
+
     public int getIdAgenda() {
         return idAgenda;
     }
@@ -64,64 +75,14 @@ public class Agendamento {
     private String cpf;
     private String placa;
     //
-
     private Date dataCriacao;
     private Date dataAgendada;
-
     //
-    private ArrayList<String> horariosDisponiveis;
-    private String horarioEscolhido;
-
-
+    private int dia;
+    private int hora;
+    //
     private String carroDescricao;
 
-    public AbstractList<String> criarAgendamento() {
-        horariosDisponiveis = new ArrayList<>();
-        inicializarHorarios();
-        return horariosDisponiveis;
-    }
-
-    private void inicializarHorarios() {
-        horariosDisponiveis.add("28/10/2024 - 08:00");
-        horariosDisponiveis.add("28/10/2024 - 09:00");
-        horariosDisponiveis.add("28/10/2024 - 10:00");
-        horariosDisponiveis.add("28/10/2024 - 11:00");
-        horariosDisponiveis.add("28/10/2024 - 12:00");
-    }
-
-    public void exibirHorariosDisponiveis() {
-        System.out.println("Horários disponíveis:");
-        for (int i = 0; i < horariosDisponiveis.size(); i++) {
-            System.out.println((i + 1) + ". " + horariosDisponiveis.get(i));
-        }
-    }
-
-    public void escolherHorario() {
-        Scanner scanner = new Scanner(System.in);
-        exibirHorariosDisponiveis();
-
-        System.out.print("Escolha um horário (digite o número correspondente): ");
-        int escolha = scanner.nextInt();
-
-        if (escolha > 0 && escolha <= horariosDisponiveis.size()) {
-            horarioEscolhido = horariosDisponiveis.get(escolha - 1);
-            System.out.println("Horário escolhido: " + horarioEscolhido);
-            horariosDisponiveis.remove(escolha - 1);
-        } else {
-            System.out.println("Opção inválida! Tente novamente.");
-            escolherHorario();
-        }
-    }
-
-    public String getHorarioEscolhido() {
-        return horarioEscolhido;
-    }
-
-    public static void main(String[] args) {
-        Agendamento agendamento = new Agendamento();
-        agendamento.escolherHorario();
-        System.out.println("Seu agendamento foi confirmado para: " + agendamento.getHorarioEscolhido());
-    }
 }
 
 

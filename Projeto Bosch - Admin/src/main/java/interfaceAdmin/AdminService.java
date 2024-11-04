@@ -117,7 +117,6 @@ public class AdminService {
                 agendamento.setCarroDescricao(a.getCarroDescricao());
                 cliente.setCpf_cliente(a.getCpf());
                 carro.setPlaca(a.getPlaca());
-
                 return true;
             }
         }

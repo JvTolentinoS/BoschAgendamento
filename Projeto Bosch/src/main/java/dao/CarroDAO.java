@@ -4,7 +4,6 @@ package dao;
 
 import conexaofabrica.Conexao;
 import entidade.Carro;
-import entidade.Cliente;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CarroDAO {
-    public void salvar(Carro carro, Cliente cliente) {
+
+    public void salvar(Carro carro) {
         String sql = "INSERT INTO carro (carro_placa, carro_modelo, carro_marca, carro_ano, cpf) VALUE (?, ?, ?, ?, ?)";
 
         Connection conn = null;
@@ -28,7 +28,7 @@ public class CarroDAO {
             pstm.setString(2, carro.getModelo());
             pstm.setString(3, carro.getMarca());
             pstm.setString(4, carro.getAno());
-            pstm.setString(5, cliente.getCpf_cliente());
+            pstm.setString(5, carro.getCpf());
 
             pstm.execute();
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class CarroDAO {
         }
     }
 
-    public void atualizar(Carro carro, Cliente cliente) {
+    public void atualizar(Carro carro) {
         String sql = "UPDATE carro SET carro_modelo = ?, carro_marca = ?, carro_ano = ? WHERE carro_placa = ?";
 
         Connection conn = null;
@@ -78,7 +78,7 @@ public class CarroDAO {
         }
     }
 
-    public void deletar(Carro carro, Cliente cliente, String cpf) {
+    public void deletar(String cpf) {
         String sql = "DELETE FROM carro WHERE cpf = ?";
 
         Connection conn = null;
