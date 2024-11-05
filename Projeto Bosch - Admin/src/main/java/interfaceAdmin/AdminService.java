@@ -70,7 +70,7 @@ public class AdminService {
                             if (resp.equals("S")) {
                                 respostaValida = true;
                             } else if (resp.equals("N")) {
-                                continuar = false; // Sai do loop se o usuário não quiser mais consultar
+                                continuar = false;
                                 respostaValida = true;
                             } else {
                                 System.out.println("Entrada inválida! Por favor, digite apenas 'S' para Sim ou 'N' para Não.");

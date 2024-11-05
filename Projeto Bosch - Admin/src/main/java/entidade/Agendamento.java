@@ -77,10 +77,8 @@ public class Agendamento {
     //
     private Date dataCriacao;
     private Date dataAgendada;
-    //
     private int dia;
     private int hora;
-    //
     private String carroDescricao;
 
 }

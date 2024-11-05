@@ -292,7 +292,7 @@ public class ClienteServico {
                         System.out.print("\nEscolha uma opção (0-5): ");
                         opcaoData = scanner.nextInt();
                         if (opcaoData < 0 || opcaoData > 5) {
-                            throw new InputMismatchException(); // Lança exceção se a opção não estiver entre 1 e 5
+                            throw new InputMismatchException();
                         }
                         entradaValida = true;
 
@@ -311,7 +311,7 @@ public class ClienteServico {
                         }
                     } catch (InputMismatchException e) {
                         System.out.println("Opção inválida! Por favor, escolha uma das opções (0-5)");
-                        scanner.nextLine(); // Limpa o buffer
+                        scanner.nextLine();
                     }
                 }
 

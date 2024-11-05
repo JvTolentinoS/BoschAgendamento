@@ -5,7 +5,6 @@ import java.util.Scanner;
 public class UtilCollection {
     public static void defaultSwitch(Scanner scanner) {
         System.out.println("Opção inválida!");
-        scanner.next();
     }
 
     public static void defaultError(Scanner scanner) {

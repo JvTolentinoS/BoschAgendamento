@@ -4,14 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-//FABRICA DE CONEXÕES | TESTE
+
 public class Conexao {
 
-    //CREDENCIAIS
+
     private static final String USERNAME = "root";
     private static final String SENHA = "root";
-
-    //CAMINHO
     private static final String URL = "jdbc:mysql://34.151.249.135:3306/boschbd";
 
     public static Connection criarConexao() throws Exception {
@@ -29,7 +27,7 @@ public class Conexao {
         }
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{ // TESTE
 
         Connection con = criarConexao();
 

@@ -40,9 +40,6 @@ public class InterfaceService {
                             System.out.println("Iniciando processo de ver agendamentos...");
                             clienteServico.registradorVerAgendas(cliente, carro, agendamento);
                             break;
-                            case 3: // Ver Carros
-                                System.out.println("Iniciando processo de ver carros...");
-                            break;
                             case 0:
                                 System.out.println("Terminando aplicação...");
                                 System.exit(0);

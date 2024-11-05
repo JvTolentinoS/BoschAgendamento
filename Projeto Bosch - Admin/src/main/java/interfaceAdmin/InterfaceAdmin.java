@@ -6,10 +6,6 @@ import java.util.Scanner;
 public class InterfaceAdmin {
     static AdminService adminService = new AdminService();
 
-    public static void main(String[] args) {
-        initialInterface(adminService);
-    }
-
     public static void initialInterface(AdminService adminService) {
         int i;
         Scanner scanner = new Scanner(System.in);
@@ -21,10 +17,13 @@ public class InterfaceAdmin {
                     switch (i) {
                         case 0: System.exit(0);
                         case 1: adminService.AdminServiceInitialize();
-                        //default: UtilCollection.defaultError(scanner);
+                            break;
+                        default:
+                            UtilCollection.defaultError(scanner);
+                            break;
                     }
             } catch (InputMismatchException e) {
-              //  UtilCollection.defaultError(scanner);
+               UtilCollection.defaultError(scanner);
             }
         } while (true);
     }
